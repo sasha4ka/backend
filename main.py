@@ -29,7 +29,7 @@ class Room:
             if uid != user_id:
                 await ws.send_json(
                     {"action": "new_message",
-                        "from": uid,
+                        "from": user_id,
                         "text": message}
                 )
 
@@ -65,7 +65,7 @@ class Room:
             f"Chat: {self.queue}"
 
 
-rooms.append(Room("host_example", "pass123"))
+rooms.append(Room("host_example", ""))
 rooms[0].room_id = "example_room_01"
 
 
@@ -137,9 +137,15 @@ async def websocket_listener(
                 result, dices_result = calculate_roll(formula)
                 formula_string = formula_to_string(formula)
 
-                await room.new_message(
-                    "", f"{user_id} rolled the dice {formula_string}: {result}"
-                )
+                if formula_string == "1d2":
+                    await room.new_message(
+                        "", f"{user_id} flipped a coin: {result}"
+                    )
+                else:
+                    await room.new_message(
+                        "",
+                        f"{user_id} rolled the dice {formula_string}: {result}"
+                    )
                 await room.roll_dice(user_id, formula, dices_result, result)
 
     except WebSocketDisconnect:
