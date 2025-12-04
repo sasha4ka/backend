@@ -28,6 +28,8 @@ class Room:
             self.participants.pop(user_id)
         except KeyError:
             pass
+        if len(self.participants) == 0:
+            rooms.remove(self)
 
     async def new_message(self, user_id: str, message: str):
         self.queue.append((user_id, message))
@@ -45,7 +47,7 @@ class Room:
         dices_result: dict,
         total: int
     ):
-        for uid, ws in self.participants.items():
+        for _, ws in self.participants.items():
             await ws.send_json(
                 {"action": "dice_rolled",
                     "from": user_id,
@@ -79,12 +81,29 @@ class create_room_model(BaseModel):
     password: str = Field(default="", description="password for your room")
 
 
-@app.post('/create_room')
+@app.post('/room')
 async def create_room(model: create_room_model):
+    for room in rooms:
+        if room.host_id == model.host_id:
+            return {"status": "host_already_has_room", "room_id": room.room_id}
     room = Room(model.host_id, model.password)
     rooms.append(room)
     print("\n".join([str(room) for room in rooms]))
     return {"status": "room_created", "room_id": room.room_id}
+
+
+@app.get('/rooms')
+async def get_rooms():
+    return {
+        "rooms": [
+            {
+                "room_id": room.room_id,
+                "host_id": room.host_id,
+                "online": len(room.participants),
+                "password_required": bool(room.password)
+            } for room in rooms
+        ]
+    }
 
 
 @app.websocket('/ws/{room_id}/{user_id}')

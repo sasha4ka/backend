@@ -55,7 +55,7 @@ http://127.0.0.1:8000/docs
 
 ## HTTP API
 
-POST /create_room
+#### POST /room
 
 Request body (JSON):
 
@@ -72,6 +72,23 @@ Response (JSON):
 {
 	"status": "room_created",
 	"room_id": "<generated-room-id>"
+}
+```
+
+#### GET /rooms
+
+Response (JSON):
+
+```json
+{
+    "rooms": [
+        {
+            "room_id": "{room_id}",
+            "host_id": "{host_id}",
+            "online": 8,
+            "password_required": true
+        }
+    ]
 }
 ```
 
