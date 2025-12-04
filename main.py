@@ -18,10 +18,16 @@ class Room:
         self.queue = []
 
     def add_client(self, user_id: str, websocket: WebSocket):
-        self.participants.update({user_id: websocket})
+        try:
+            self.participants.update({user_id: websocket})
+        except KeyError:
+            pass
 
     def remove_client(self, user_id: str):
-        self.participants.pop(user_id)
+        try:
+            self.participants.pop(user_id)
+        except KeyError:
+            pass
 
     async def new_message(self, user_id: str, message: str):
         self.queue.append((user_id, message))
