@@ -32,12 +32,11 @@ class Room:
     async def new_message(self, user_id: str, message: str):
         self.queue.append((user_id, message))
         for uid, ws in self.participants.items():
-            if uid != user_id:
-                await ws.send_json(
-                    {"action": "new_message",
-                        "from": user_id,
-                        "text": message}
-                )
+            await ws.send_json(
+                {"action": "new_message",
+                    "from": user_id,
+                    "text": message}
+            )
 
     async def roll_dice(
         self,

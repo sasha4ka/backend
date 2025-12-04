@@ -144,7 +144,7 @@ Server-side actions:
 
 ```json
 // When message sent
-// broadcasting to everyone except sender
+// broadcasting to everyone
 {
     "action": "new_mesage",
     "from": "gorsh04ek",
