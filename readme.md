@@ -143,9 +143,20 @@ User-side actions:
     ] 
 }
 
+// Get room info
+{ "action": "get_room_info" }
+// Response
+{
+    "action": "room_info",
+    "room_id": "{room_Id}",
+    "host_id": "{host_id}",
+    "participants": ["sahsha4ka", "nickname_2"]
+}
+
 
 // Leave room
 { "action": "leave_room" }
+// When anybody leaves the room, sends to everyone action `room_info` see (get room info)
 
 // Roll dice
 {

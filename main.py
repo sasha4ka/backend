@@ -33,9 +33,16 @@ class Room:
         except KeyError:
             pass
 
-    def remove_client(self, user_id: str):
+    async def remove_client(self, user_id: str):
         try:
             self.participants.pop(user_id)
+            for uid, websocket in self.participants.items():
+                await websocket.send_json({
+                    "action": "room_info",
+                    "room_id": self.room_id,
+                    "host_id": self.host_id,
+                    "participants": list(self.participants.keys())
+                })
         except KeyError:
             pass
         if len(self.participants) == 0:
@@ -162,7 +169,7 @@ async def websocket_listener(
                 messages = room.get_message_queue()
                 await websocket.send_json({"messages": messages})
             if action == "leave_room":
-                room.remove_client(user_id)
+                await room.remove_client(user_id)
                 await room.new_message("", f"{user_id} has left the room.")
                 await websocket.close()
                 break
@@ -181,8 +188,15 @@ async def websocket_listener(
                         f"{user_id} rolled the dice {formula_string}: {result}"
                     )
                 await room.roll_dice(user_id, formula, dices_result, result)
+            if action == "get_room_info":
+                await websocket.send_json({
+                    "action": "room_info",
+                    "room_id": room.room_id,
+                    "host_id": room.host_id,
+                    "participants": list(room.participants.keys())
+                })
 
     except WebSocketDisconnect:
-        room.remove_client(user_id)
+        await room.remove_client(user_id)
         await room.new_message("", f"{user_id} has left the room.")
         print("Client disconnected")
