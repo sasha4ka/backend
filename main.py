@@ -27,9 +27,16 @@ class Room:
         self.participants = {}
         self.queue = []
 
-    def add_client(self, user_id: str, websocket: WebSocket):
+    async def add_client(self, user_id: str, websocket: WebSocket):
         try:
             self.participants.update({user_id: websocket})
+            for uid, websocket in self.participants.items():
+                await websocket.send_json({
+                    "action": "room_info",
+                    "room_id": self.room_id,
+                    "host_id": self.host_id,
+                    "participants": list(self.participants.keys())
+                })
         except KeyError:
             pass
 
@@ -155,7 +162,7 @@ async def websocket_listener(
         "status": "joined_room"
     })
 
-    room.add_client(user_id, websocket)
+    await room.add_client(user_id, websocket)
     await room.new_message("", f"{user_id} has joined the room.")
     try:
         while True:

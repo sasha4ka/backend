@@ -145,13 +145,7 @@ User-side actions:
 
 // Get room info
 { "action": "get_room_info" }
-// Response
-{
-    "action": "room_info",
-    "room_id": "{room_Id}",
-    "host_id": "{host_id}",
-    "participants": ["sahsha4ka", "nickname_2"]
-}
+// The server will send "room_info" action
 
 
 // Leave room
@@ -189,6 +183,15 @@ Server-side actions:
         "4": [], "8": [], "10": [], "12": [] 
     },
     "total": 26
+}
+
+// When the room's info changed or
+// the user requested an info
+{
+    "action": "room_info",
+    "room_id": "{room_Id}",
+    "host_id": "{host_id}",
+    "participants": ["sahsha4ka", "nickname_2"]
 }
 ```
 
